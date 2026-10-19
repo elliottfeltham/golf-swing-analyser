@@ -3,12 +3,14 @@ node_modules/
 
 # Next.js and build output
 .next/
+.vercel/
 out/
 dist/
 coverage/
 playwright-report/
 test-results/
 public/mediapipe/wasm/
+test-fixtures/videos/*.mp4
 
 # Local environment and secrets
 .env
@@ -27,3 +29,4 @@ public/mediapipe/wasm/
 .DS_Store
 .idea/
 .vscode/
+.vercel

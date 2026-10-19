@@ -2,7 +2,11 @@
 
 import { useRef, useState } from "react";
 
-import { PoseWorkerClient } from "@/pose/pose-worker-client";
+import {
+  benchmarkVideoModel,
+  type PoseBenchmarkResult,
+  type PoseModelVariant,
+} from "@/pose/benchmark-video";
 import { validateVideoFile } from "@/video/validate-video-file";
 
 type CheckStatus =
@@ -14,15 +18,7 @@ type CheckStatus =
   | "no-pose"
   | "error";
 
-interface CheckResult {
-  landmarkCount: number;
-  sampledAtSeconds: number;
-}
-
-function waitForMediaEvent(
-  video: HTMLVideoElement,
-  eventName: "loadedmetadata" | "seeked",
-) {
+function waitForMetadata(video: HTMLVideoElement) {
   return new Promise<void>((resolve, reject) => {
     const handleSuccess = () => {
       cleanup();
@@ -33,11 +29,11 @@ function waitForMediaEvent(
       reject(new Error("The browser could not decode this video."));
     };
     const cleanup = () => {
-      video.removeEventListener(eventName, handleSuccess);
+      video.removeEventListener("loadedmetadata", handleSuccess);
       video.removeEventListener("error", handleError);
     };
 
-    video.addEventListener(eventName, handleSuccess, { once: true });
+    video.addEventListener("loadedmetadata", handleSuccess, { once: true });
     video.addEventListener("error", handleError, { once: true });
   });
 }
@@ -45,12 +41,13 @@ function waitForMediaEvent(
 export function PoseReadinessCheck() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [status, setStatus] = useState<CheckStatus>("idle");
-  const [result, setResult] = useState<CheckResult>();
+  const [activeModel, setActiveModel] = useState<PoseModelVariant>();
+  const [results, setResults] = useState<PoseBenchmarkResult[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>();
 
   async function handleFile(file: File) {
     setErrorMessage(undefined);
-    setResult(undefined);
+    setResults([]);
 
     const validation = validateVideoFile(file);
     if (!validation.valid) {
@@ -62,55 +59,41 @@ export function PoseReadinessCheck() {
     const video = videoRef.current;
     if (!video) return;
 
-    let client: PoseWorkerClient | undefined;
     const objectUrl = URL.createObjectURL(file);
 
     try {
       setStatus("loading-video");
       video.src = objectUrl;
       video.load();
-      await waitForMediaEvent(video, "loadedmetadata");
+      await waitForMetadata(video);
 
       if (!Number.isFinite(video.duration) || video.duration <= 0) {
         throw new Error("The video has no readable duration.");
       }
 
-      const sampledAtSeconds = Math.min(
-        video.duration / 2,
-        Math.max(0, video.duration - 0.05),
-      );
-      video.currentTime = sampledAtSeconds;
-      await waitForMediaEvent(video, "seeked");
-
-      setStatus("loading-model");
-      client = new PoseWorkerClient();
-      const origin = window.location.origin;
-      await client.initialise({
-        wasmBaseUrl: `${origin}/mediapipe/wasm`,
-        modelAssetUrl: `${origin}/mediapipe/models/pose_landmarker_full.task`,
-      });
-
-      setStatus("analysing");
-      const frame = await createImageBitmap(video);
-      const pose = await client.analyseFrame(frame, sampledAtSeconds * 1_000);
-
-      if (!pose) {
-        setStatus("no-pose");
-        return;
+      const benchmarkResults: PoseBenchmarkResult[] = [];
+      for (const model of ["Full", "Lite"] as const) {
+        setActiveModel(model);
+        setStatus(
+          benchmarkResults.length === 0 ? "loading-model" : "analysing",
+        );
+        const result = await benchmarkVideoModel(video, model);
+        benchmarkResults.push(result);
+        setResults([...benchmarkResults]);
       }
 
-      setResult({
-        landmarkCount: pose.landmarks.length,
-        sampledAtSeconds,
-      });
-      setStatus("success");
+      setStatus(
+        benchmarkResults.some((result) => result.detectedFrames > 0)
+          ? "success"
+          : "no-pose",
+      );
     } catch (error) {
       setStatus("error");
       setErrorMessage(
         error instanceof Error ? error.message : "The pose check failed.",
       );
     } finally {
-      client?.dispose();
+      setActiveModel(undefined);
       URL.revokeObjectURL(objectUrl);
       video.removeAttribute("src");
       video.load();
@@ -126,7 +109,7 @@ export function PoseReadinessCheck() {
       aria-labelledby="readiness-heading"
       className="mt-12 overflow-hidden rounded-3xl border border-slate-700 bg-slate-900/80 shadow-2xl shadow-emerald-950/20"
     >
-      <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.2fr_0.8fr]">
+      <div className="grid gap-8 p-6 sm:p-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <p className="text-xs font-semibold tracking-[0.18em] text-emerald-400 uppercase">
             Technical proof
@@ -135,9 +118,9 @@ export function PoseReadinessCheck() {
             Check pose tracking on your video
           </h2>
           <p className="mt-3 max-w-xl text-sm leading-6 text-slate-300">
-            This early build samples one frame to verify browser decoding and
-            MediaPipe pose detection. The video remains on this device and is
-            not uploaded.
+            This early build samples six frames with both MediaPipe models to
+            verify browser decoding and pose detection. The video remains on
+            this device and is not uploaded.
           </p>
 
           <label className="mt-6 flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed border-slate-600 bg-slate-950/60 px-6 text-center transition hover:border-emerald-500 focus-within:ring-2 focus-within:ring-emerald-400">
@@ -174,7 +157,8 @@ export function PoseReadinessCheck() {
         >
           <StatusContent
             status={status}
-            result={result}
+            activeModel={activeModel}
+            results={results}
             errorMessage={errorMessage}
           />
         </div>
@@ -185,25 +169,24 @@ export function PoseReadinessCheck() {
 
 function StatusContent({
   status,
-  result,
+  activeModel,
+  results,
   errorMessage,
 }: {
   status: CheckStatus;
-  result?: CheckResult;
+  activeModel?: PoseModelVariant;
+  results: PoseBenchmarkResult[];
   errorMessage?: string;
 }) {
-  if (status === "success" && result) {
+  if (status === "success") {
     return (
-      <div>
-        <p className="font-semibold text-emerald-400">Pose detected</p>
-        <p className="mt-3 text-3xl font-semibold text-white">
-          {result.landmarkCount} landmarks
-        </p>
-        <p className="mt-2 text-sm leading-6 text-slate-400">
-          Found in the frame at {result.sampledAtSeconds.toFixed(2)} seconds.
-          This proves the browser-to-worker inference path; full video
-          processing comes next.
-        </p>
+      <div className="w-full">
+        <p className="font-semibold text-emerald-400">Pose tracking verified</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2">
+          {results.map((result) => (
+            <BenchmarkCard key={result.model} result={result} />
+          ))}
+        </div>
       </div>
     );
   }
@@ -212,7 +195,7 @@ function StatusContent({
     return (
       <div>
         <p className="font-semibold text-amber-300">
-          No pose found in the sampled frame
+          No pose found in the sampled frames
         </p>
         <p className="mt-3 text-sm leading-6 text-slate-400">
           Try a face-on recording with the golfer’s full body visible and good
@@ -231,19 +214,42 @@ function StatusContent({
     );
   }
 
-  const messages = {
-    idle: "Your result will appear here.",
-    "loading-video": "Reading video metadata…",
-    "loading-model": "Loading the pose model…",
-    analysing: "Analysing the sampled frame…",
-  } satisfies Record<
-    Exclude<CheckStatus, "success" | "no-pose" | "error">,
-    string
-  >;
+  const message =
+    status === "loading-video"
+      ? "Reading video metadata…"
+      : status === "idle"
+        ? "Your result will appear here."
+        : `${activeModel ?? "Pose"} model: loading and analysing frames…`;
 
+  return <p className="text-sm text-slate-400">{message}</p>;
+}
+
+function BenchmarkCard({ result }: { result: PoseBenchmarkResult }) {
   return (
-    <p className="text-sm text-slate-400">
-      {status === "success" ? "Pose detected." : messages[status]}
-    </p>
+    <div className="rounded-xl border border-slate-800 bg-slate-900 p-4">
+      <p className="font-semibold text-white">{result.model}</p>
+      <dl className="mt-3 space-y-2 text-xs text-slate-400">
+        <div className="flex justify-between gap-4">
+          <dt>Pose frames</dt>
+          <dd className="text-slate-200">
+            {result.detectedFrames}/{result.sampledFrames}
+          </dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt>Landmarks</dt>
+          <dd className="text-slate-200">{result.landmarkCount || "—"}</dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt>Average frame</dt>
+          <dd className="text-slate-200">
+            {result.averageInferenceMs.toFixed(0)} ms
+          </dd>
+        </div>
+        <div className="flex justify-between gap-4">
+          <dt>Model load</dt>
+          <dd className="text-slate-200">{result.modelLoadMs.toFixed(0)} ms</dd>
+        </div>
+      </dl>
+    </div>
   );
 }
