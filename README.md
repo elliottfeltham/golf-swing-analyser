@@ -48,7 +48,38 @@ Video frames and raw pose landmarks remain in the browser. Only a reduced set of
 
 ## Project status
 
-Planning is complete and implementation has not yet started. The full approved plan is available in [docs/implementation-plan.md](docs/implementation-plan.md).
+Implementation is in progress. The current foundation includes:
+
+- A responsive Next.js application shell.
+- A browser upload and one-frame pose-readiness check.
+- MediaPipe inference isolated in a Web Worker.
+- A server-only OpenRouter adapter with runtime validation and a deterministic fallback.
+- Strict TypeScript, ESLint, Prettier, Vitest, and Playwright quality gates.
+
+The full approved plan is available in [docs/implementation-plan.md](docs/implementation-plan.md).
+
+## Local development
+
+Requirements: Node.js 22.12 or later and npm 11 or later.
+
+```bash
+npm install
+cp .env.example .env.local
+npm run dev
+```
+
+The application works without an OpenRouter key by returning its deterministic report. Add `OPENROUTER_API_KEY` to `.env.local` to exercise live AI generation; the key is read only by the server route.
+
+Run the quality gates with:
+
+```bash
+npm run format:check
+npm run lint
+npm run typecheck
+npm run test:run
+npm run test:e2e
+npm run build
+```
 
 ## Documentation
 
