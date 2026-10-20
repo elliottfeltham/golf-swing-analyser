@@ -20,6 +20,7 @@ test-fixtures/videos/*.mp4
 # Package-manager and tool caches
 .npm/
 .turbo/
+.impeccable/questions/
 *.tsbuildinfo
 
 # Logs

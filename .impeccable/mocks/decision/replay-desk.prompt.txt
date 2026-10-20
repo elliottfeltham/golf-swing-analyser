@@ -1,0 +1,8 @@
+Create a high-fidelity desktop web application design comp, 16:10 landscape,
+for Golf Swing Analyser. The Replay Desk direction translates elite sports
+broadcast replay and telestration into a golfer-operated analysis tool. A large
+video, integrated timecode and phase rail, direct overlay controls, evidence
+rundown, and timestamp-linked observations form the workspace. Use charcoal,
+warm off-white, one orange-red live-state color, condensed timecode typography,
+sharp geometry, and hairline separators. Avoid rounded-card dashboards,
+gradients, glass, neon, pills, and unsupported golf-performance claims.

@@ -1,0 +1,232 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-20T10:38:03Z",
+  "title": "Design System: Golf Swing Analyser",
+  "extensions": {
+    "colorMeta": {
+      "archive-bone": {
+        "role": "neutral",
+        "displayName": "Archive Bone",
+        "canonical": "#F2EFE6",
+        "tonalRamp": ["#FAF8F2", "#F2EFE6", "#DED9CC"]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#FAF8F2",
+        "tonalRamp": ["#FFFFFF", "#FAF8F2", "#F2EFE6"]
+      },
+      "carbon": {
+        "role": "neutral",
+        "displayName": "Carbon",
+        "canonical": "#171816",
+        "tonalRamp": ["#343631", "#171816", "#0B0C0B"]
+      },
+      "video-black": {
+        "role": "neutral",
+        "displayName": "Video Black",
+        "canonical": "#0B0C0B",
+        "tonalRamp": ["#242623", "#0B0C0B", "#000000"]
+      },
+      "signal-vermilion": {
+        "role": "primary",
+        "displayName": "Signal Vermilion",
+        "canonical": "#F2552C",
+        "tonalRamp": ["#FF8A69", "#F2552C", "#B93416"]
+      },
+      "evidence-cobalt": {
+        "role": "secondary",
+        "displayName": "Evidence Cobalt",
+        "canonical": "#3157D5",
+        "tonalRamp": ["#7894F0", "#3157D5", "#203D9D"]
+      },
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Graphite",
+        "canonical": "#686A64",
+        "tonalRamp": ["#8F918A", "#686A64", "#454741"]
+      },
+      "frame-grey": {
+        "role": "neutral",
+        "displayName": "Frame Grey",
+        "canonical": "#A7A397",
+        "tonalRamp": ["#C8C4B9", "#A7A397", "#77746C"]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "canonical": "#CBC6B9",
+        "tonalRamp": ["#E1DDD3", "#CBC6B9", "#A7A397"]
+      },
+      "success": {
+        "role": "semantic",
+        "displayName": "Tracking Green",
+        "canonical": "#2F7254",
+        "tonalRamp": ["#7AAC91", "#2F7254", "#1D4E38"]
+      },
+      "warning": {
+        "role": "semantic",
+        "displayName": "Caution Ochre",
+        "canonical": "#A7651F",
+        "tonalRamp": ["#D99A52", "#A7651F", "#70400F"]
+      },
+      "danger": {
+        "role": "semantic",
+        "displayName": "Error Red",
+        "canonical": "#A33B35",
+        "tonalRamp": ["#D47770", "#A33B35", "#6D2421"]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Sequence Display",
+        "purpose": "Rare oversized statements and frame numbers."
+      },
+      "headline": {
+        "displayName": "Screen Headline",
+        "purpose": "Screen titles and result statements."
+      },
+      "title": {
+        "displayName": "Register Title",
+        "purpose": "Panel and insight headings."
+      },
+      "body": {
+        "displayName": "Explanatory Body",
+        "purpose": "Instructions, analysis, and limitations."
+      },
+      "label": {
+        "displayName": "Phase Label",
+        "purpose": "Controls, phase names, and status labels."
+      },
+      "data": {
+        "displayName": "Measured Data",
+        "purpose": "Timestamps, frame numbers, angles, and confidence."
+      }
+    },
+    "shadows": [
+      {
+        "name": "temporary-overlay",
+        "value": "0 12px 32px rgb(23 24 22 / 0.18)",
+        "purpose": "Menus, dialogs, and scrub-preview thumbnails only."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 3px rgb(49 87 213 / 0.28)",
+        "purpose": "Additional keyboard focus separation where needed."
+      }
+    ],
+    "motion": [
+      {
+        "name": "state-fast",
+        "value": "160ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Hover, selection, and control-state changes."
+      },
+      {
+        "name": "panel-standard",
+        "value": "240ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Disclosure and evidence-panel transitions."
+      }
+    ],
+    "breakpoints": [
+      { "name": "mobile", "value": "0px" },
+      { "name": "tablet", "value": "768px" },
+      { "name": "desktop", "value": "1280px" },
+      { "name": "wide", "value": "1600px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The single decisive action in a decision area.",
+      "html": "<button class=\"ds-btn-primary\">ANALYSE SWING</button>",
+      "css": ".ds-btn-primary { min-height:44px; border:1px solid #F2552C; border-radius:4px; padding:12px 16px; background:#F2552C; color:#171816; font:650 13px/1 'Barlow Condensed',Arial,sans-serif; letter-spacing:.075em; text-transform:uppercase; transition:background 160ms,color 160ms,border-color 160ms; } .ds-btn-primary:hover { background:#171816; border-color:#171816; color:#FAF8F2; } .ds-btn-primary:focus-visible { outline:2px solid #3157D5; outline-offset:2px; }"
+    },
+    {
+      "name": "Secondary Action",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "A supporting action that does not compete with the primary.",
+      "html": "<button class=\"ds-btn-secondary\">CANCEL</button>",
+      "css": ".ds-btn-secondary { min-height:44px; border:1px solid #171816; border-radius:4px; padding:11px 15px; background:transparent; color:#171816; font:650 13px/1 'Barlow Condensed',Arial,sans-serif; letter-spacing:.075em; text-transform:uppercase; transition:background 160ms,color 160ms; } .ds-btn-secondary:hover { background:#171816; color:#FAF8F2; } .ds-btn-secondary:focus-visible { outline:2px solid #3157D5; outline-offset:2px; }"
+    },
+    {
+      "name": "Evidence Link",
+      "kind": "button",
+      "refersTo": "evidence-link",
+      "description": "Seeks the player to the timestamp supporting an observation.",
+      "html": "<button class=\"ds-evidence-link\"><span>FRAME 012</span><span>00:00.912</span></button>",
+      "css": ".ds-evidence-link { display:flex; gap:12px; align-items:center; min-height:44px; border:0; border-bottom:1px solid #3157D5; padding:8px 0; background:transparent; color:#3157D5; font:500 13px/1.3 'IBM Plex Mono',monospace; } .ds-evidence-link:hover { border-bottom-width:2px; } .ds-evidence-link:focus-visible { outline:2px solid #3157D5; outline-offset:3px; }"
+    },
+    {
+      "name": "Phase Cell",
+      "kind": "custom",
+      "refersTo": "phase-active",
+      "description": "The selected frame and phase within the sequence rail.",
+      "html": "<button class=\"ds-phase\"><strong>012</strong><span>TOP</span><time>00:00.912</time></button>",
+      "css": ".ds-phase { position:relative; display:grid; grid-template-columns:auto 1fr; gap:4px 10px; min-width:148px; border:1px solid #171816; border-radius:2px; padding:10px; background:#FAF8F2; color:#171816; text-align:left; } .ds-phase::before,.ds-phase::after { content:''; position:absolute; width:12px; height:12px; border-color:#F2552C; } .ds-phase::before { top:-2px; left:-2px; border-top:4px solid #F2552C; border-left:4px solid #F2552C; } .ds-phase::after { right:-2px; bottom:-2px; border-right:4px solid #F2552C; border-bottom:4px solid #F2552C; } .ds-phase strong,.ds-phase span { font:650 14px/1 'Barlow Condensed',Arial,sans-serif; letter-spacing:.05em; } .ds-phase time { grid-column:2; font:500 12px/1.3 'IBM Plex Mono',monospace; } .ds-phase:focus-visible { outline:2px solid #3157D5; outline-offset:3px; }"
+    },
+    {
+      "name": "Tracking Status",
+      "kind": "chip",
+      "refersTo": "field",
+      "description": "Plain-language pose tracking quality with redundant shape and text.",
+      "html": "<span class=\"ds-status\"><svg viewBox=\"0 0 12 12\" aria-hidden=\"true\"><circle cx=\"6\" cy=\"6\" r=\"5\"/></svg>TRACKING: USABLE</span>",
+      "css": ".ds-status { display:inline-flex; align-items:center; gap:7px; min-height:28px; color:#2F7254; font:650 13px/1 'Barlow Condensed',Arial,sans-serif; letter-spacing:.06em; } .ds-status svg { width:12px; height:12px; fill:#2F7254; }"
+    },
+    {
+      "name": "Evidence Register",
+      "kind": "card",
+      "refersTo": "field",
+      "description": "A ruled reading column tied to the selected frame.",
+      "html": "<section class=\"ds-register\"><header><span>EVIDENCE</span><time>00:00.912</time></header><h3>FRAME 012 — TOP</h3><p>The selected observation is linked to this timestamp and tracking state.</p></section>",
+      "css": ".ds-register { border:0; border-top:1px solid #171816; border-bottom:1px solid #171816; padding:16px 0; background:#FAF8F2; color:#171816; } .ds-register header { display:flex; justify-content:space-between; gap:16px; border-bottom:1px solid #CBC6B9; padding-bottom:10px; font:650 13px/1 'Barlow Condensed',Arial,sans-serif; letter-spacing:.075em; } .ds-register time { font-family:'IBM Plex Mono',monospace; } .ds-register h3 { margin:18px 0 8px; font:650 24px/1 'Barlow Condensed',Arial,sans-serif; } .ds-register p { max-width:60ch; margin:0; color:#686A64; font:400 16px/1.5 'IBM Plex Sans',Arial,sans-serif; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Motion Contact Sheet",
+    "overview": "A frame-first sports analysis instrument structured by photographic sequencing, coaching annotation, and exact evidence links. Warm technical paper, carbon media, and one vermilion active state replace the generic dark SaaS dashboard. The analog reference is structural rather than nostalgic.",
+    "keyCharacteristics": [
+      "The swing frame is the visual authority.",
+      "Editorial fields and rules replace floating card grids.",
+      "Vermilion marks one active moment; cobalt marks evidence links.",
+      "Condensed phase typography pairs with calm prose and tabular data.",
+      "Missing or uncertain tracking remains visible."
+    ],
+    "rules": [
+      {
+        "name": "The One Active Moment Rule",
+        "body": "Vermilion identifies only the current action, frame, or phase.",
+        "section": "colors"
+      },
+      {
+        "name": "The Frame-First Rule",
+        "body": "The selected frame and playback controls precede charts, measurements, and prose at every breakpoint.",
+        "section": "layout"
+      },
+      {
+        "name": "The Evidence Link Rule",
+        "body": "Cobalt always means that an interaction returns the user to supporting evidence.",
+        "section": "colors"
+      },
+      {
+        "name": "The Flat-By-Default Rule",
+        "body": "Use alignment, rules, and tonal fields before shadows.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "Do make the golfer's video or selected frame the largest object.",
+      "Do link every observation to a phase, timestamp, or frame.",
+      "Do preserve uncertainty and missing tracking.",
+      "Do adapt information priority deliberately for mobile."
+    ],
+    "donts": [
+      "Don't use generic rounded-card, glass, glow, or gradient dashboard styling.",
+      "Don't imitate analog film with decorative aging effects.",
+      "Don't invent clubhead, ball-flight, diagnosis, or ideal-range claims.",
+      "Don't let generated prose outrank its evidence."
+    ]
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "title": "Choose the visual world",
+  "question": "Choose the system that should govern the full Golf Swing Analyser experience.",
+  "options": [
+    {
+      "id": "assigned",
+      "label": "The Motion Contact Sheet",
+      "kicker": "THE DIRECTION",
+      "lineage": "swing-sequence photography, film contact sheets, and coaching annotation",
+      "thesis": "Every analysis is a sequence of observable moments, with one frame promoted for close inspection.",
+      "palette": ["#F2EFE6", "#171816", "#F2552C", "#3157D5", "#A7A397"],
+      "materials": [
+        "photographic contact sheet",
+        "grease-pencil annotation",
+        "ruled film edge"
+      ],
+      "viewport": "A large selected swing frame anchors the left two-thirds; a numbered frame strip runs beneath it while a narrow evidence register on the right links phases, measurements, and written observations to exact timestamps.",
+      "risk": "The analog references must remain restrained so the product feels current rather than nostalgic.",
+      "raised": [
+        {
+          "from": "Factory catalog discipline",
+          "raise": "One evidence field owns each view; supporting data stays quiet until selected."
+        },
+        {
+          "from": "Metro chrome deletion",
+          "raise": "Type, rules, and state color carry interaction without floating dashboard furniture."
+        },
+        {
+          "from": "Gate-board priority",
+          "raise": "Responsive layouts remove lower-priority columns before they compress the primary evidence."
+        }
+      ],
+      "comp": ".impeccable/mocks/decision/motion-contact-sheet.png"
+    },
+    {
+      "id": "model-pick",
+      "label": "The Replay Desk",
+      "kicker": "IMPECCABLE’S PICK",
+      "lineage": "elite sports broadcast replay, telestration, and match analysis",
+      "thesis": "The golfer operates a compact replay suite where timecode, phases, and drawn evidence explain the swing.",
+      "palette": ["#0A0B0B", "#F4F3EE", "#FF4E21", "#8F9892", "#20382B"],
+      "materials": ["broadcast monitor", "telestrator ink", "timecode rail"],
+      "viewport": "The video fills most of the screen with a slim phase rail, direct overlay controls, and a broadcast-style evidence rundown rather than a grid of metric cards.",
+      "risk": "It is highly legible and sports-native, but it is the most familiar direction and could drift toward existing performance platforms.",
+      "comp": ".impeccable/mocks/decision/replay-desk.png"
+    },
+    {
+      "id": "challenger-orienteering",
+      "label": "The Swing Map",
+      "verdict": "competitive",
+      "lineage": "orienteering maps, fixed legends, and active course overlays",
+      "thesis": "The body and video form fixed terrain while the swing path and marked phases become the active route through it.",
+      "palette": ["#FAF9F3", "#7B2CBF", "#8C5A2B", "#5FA7D6", "#A5B36A"],
+      "materials": ["contour ink", "route overlay", "coded legend"],
+      "viewport": "The selected video frame becomes a mapped field with hand path, body lines, confidence regions, and numbered phase controls decoded by a compact legend.",
+      "case": "It makes paths, phases, and confidence exceptionally clear, but golfers identify less immediately with navigation notation than with swing-sequence or replay culture.",
+      "risk": "Too much literal map texture would compete with the golfer and weaken video legibility.",
+      "comp": ".impeccable/mocks/decision/swing-map.png",
+      "hero": "https://impeccable.style/worlds/cards/notation-diagram-systems-orienteering-map-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/notation-diagram-systems-orienteering-map.webp"
+    },
+    {
+      "id": "challenger-factory",
+      "label": "The Signal Catalog",
+      "verdict": "declined",
+      "lineage": "Factory Records catalog sleeves and plotted signals",
+      "thesis": "Each swing is a numbered artifact organized around a single white movement trace on matte black.",
+      "palette": ["#050505", "#F2F2ED", "#2B5BBF", "#F1C93B", "#D33B32"],
+      "materials": ["matte black", "plotter line", "coded color strip"],
+      "viewport": "A sparse black analysis field lets one swing trace and one numbered video frame dominate.",
+      "case": "Its focus and restraint are excellent, but the catalog code weakens golf recognition and makes ordinary controls harder to discover.",
+      "kept": "One dominant plot or frame, surrounded by deliberate quiet.",
+      "risk": "The coded identity could become opaque and self-conscious.",
+      "hero": "https://impeccable.style/worlds/cards/brand-identity-canon-saville-catalog-sleeve-hero.webp",
+      "board": "https://impeccable.style/worlds/cards/brand-identity-canon-saville-catalog-sleeve.webp"
+    },
+    {
+      "id": "challenger-metro",
+      "label": "The Live Tile Field",
+      "verdict": "declined",
+      "lineage": "panoramic typographic tiles",
+      "thesis": "Phase and measurement states become edge-to-edge live fields with almost no interface chrome.",
+      "palette": ["#050505", "#F4F4F1", "#38C6C1", "#E84271"],
+      "materials": ["flat color field", "cropped type", "live tile"],
+      "viewport": "Video, current phase, and primary observation occupy adjacent full-height panes.",
+      "case": "The chrome deletion is valuable, but a tile panorama fragments the continuous relationship between video, timeline, and evidence.",
+      "kept": "Controls should feel inherent to the composition, not added as floating chrome.",
+      "risk": "Large tiles consume too much space when the user needs simultaneous evidence.",
+      "hero": "https://impeccable.style/worlds/cards/digital-design-canon-metro-typographic-tiles-hero.webp"
+    },
+    {
+      "id": "challenger-gate-board",
+      "label": "The Phase Board",
+      "verdict": "declined",
+      "lineage": "departure boards, persistent changes, and priority columns",
+      "thesis": "Swing phases are live rows whose measurements update in place without losing their identity.",
+      "palette": ["#161817", "#F3F1E8", "#EF6A32", "#BBB8AD"],
+      "materials": ["tabular board", "sequence number", "change lamp"],
+      "viewport": "A fixed-column phase ledger sits beside video with changed or low-confidence evidence held visibly in place.",
+      "case": "The state model is excellent, but a ranked board implies schedule monitoring rather than visual movement analysis.",
+      "kept": "Preserve item identity through changes and drop responsive columns by priority.",
+      "risk": "The rigid row grammar under-serves video and charts.",
+      "hero": "https://impeccable.style/worlds/cards/vernacular-ephemera-boarding-pass-and-gate-board-hero.webp"
+    },
+    {
+      "id": "challenger-characters",
+      "label": "The Phase Cast",
+      "verdict": "declined",
+      "lineage": "character catalogs and ranked rosters",
+      "thesis": "Each phase receives a vivid identity and a fixed place in a finite swing sequence.",
+      "palette": ["#F7F1E8", "#E9A8B6", "#8DBDC3", "#E9C85F"],
+      "materials": ["flat portrait cell", "name plate", "ranked roster"],
+      "viewport": "A grid of phase portraits makes every swing moment visually unmistakable.",
+      "case": "The states are memorable, but the friendly collectible tone conflicts with serious evidence review.",
+      "kept": "Every phase must remain recognizable without reading its label.",
+      "risk": "It would trivialize uncertain analysis.",
+      "hero": "https://impeccable.style/worlds/cards/pop-culture-shelf-character-goods-catalog-hero.webp"
+    }
+  ],
+  "reroll": { "registers": ["safer", "bolder"] },
+  "buildPath": { "value": "comp", "toggle": true },
+  "canon": true,
+  "canonCard": {
+    "label": "The category standard",
+    "thesis": "A polished dark sports dashboard with rounded metric cards, green accents, and a conventional upload hero.",
+    "palette": ["#07110D", "#F4F7F5", "#38C987", "#19251F"],
+    "materials": ["rounded dashboard cards", "soft glow", "clean charts"],
+    "viewport": "A centered upload card gives way to a familiar video-and-metrics dashboard.",
+    "risk": "Professional and usable, but intentionally difficult to distinguish from competing sports and AI products.",
+    "comp": ".impeccable/mocks/decision/category-standard.png"
+  },
+  "steer": true
+}

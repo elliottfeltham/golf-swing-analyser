@@ -1,0 +1,9 @@
+Create a high-fidelity desktop web application design comp, 16:10 landscape,
+for Golf Swing Analyser. The Swing Map direction translates orienteering map
+logic into video movement analysis: the golfer is fixed terrain; the hand path
+and phases are the active route. Use a dominant face-on video, body skeleton,
+purple numbered route, restrained contour lines, confidence regions, a fixed
+legend, evidence panel, and accessible timeline. Use warm white, course purple,
+contour brown, marsh blue, and olive with technical rules and condensed phase
+labels. Keep it golf-focused and avoid literal map decoration, cards, gradients,
+glass, neon, and unsupported claims.
