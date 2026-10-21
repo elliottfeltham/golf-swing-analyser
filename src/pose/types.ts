@@ -12,6 +12,39 @@ export interface PoseFrame {
   worldLandmarks: PoseLandmark[];
 }
 
+export interface VideoMetadata {
+  durationMs: number;
+  width: number;
+  height: number;
+  aspectRatio: number;
+  mimeType: string;
+  fileSizeBytes: number;
+}
+
+export interface PoseSample {
+  timestampMs: number;
+  pose: PoseFrame | null;
+}
+
+export interface PoseSequence {
+  metadata: VideoMetadata;
+  model: "lite";
+  targetSamplesPerSecond: 12;
+  frames: PoseSample[];
+  detectedFrameCount: number;
+  usablePoseFramePercent: number;
+}
+
+export type ProcessingStage =
+  "reading-video" | "loading-model" | "analysing" | "complete";
+
+export interface ProcessingProgress {
+  stage: ProcessingStage;
+  completedFrames: number;
+  totalFrames: number;
+  percent: number;
+}
+
 export interface PoseModelOptions {
   modelAssetUrl: string;
   wasmBaseUrl: string;

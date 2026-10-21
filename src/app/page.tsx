@@ -69,8 +69,9 @@ export default function HomePage() {
         <footer className="capability-note">
           <span>Current capability</span>
           <p>
-            This build verifies browser video decoding and body-pose detection.
-            It does not infer clubhead speed, ball flight, or swing quality.
+            This build measures body-pose movement in the image plane. It does
+            not infer clubhead speed, ball flight, 3D rotation, or swing
+            quality.
           </p>
         </footer>
       </main>

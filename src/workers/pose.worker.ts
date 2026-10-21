@@ -19,11 +19,12 @@ function postResponse(response: PoseWorkerResponse) {
 }
 
 function serialiseLandmarks(landmarks: NormalizedLandmark[]): PoseLandmark[] {
-  return landmarks.map(({ x, y, z, visibility }) => ({
+  return landmarks.map(({ x, y, z, visibility, presence }) => ({
     x,
     y,
     z,
     ...(visibility === undefined ? {} : { visibility }),
+    ...(presence === undefined ? {} : { presence }),
   }));
 }
 
@@ -38,20 +39,27 @@ self.onmessage = async (event: MessageEvent<PoseWorkerRequest>) => {
         request.options.wasmBaseUrl,
       );
 
-      poseLandmarker = await PoseLandmarker.createFromOptions(fileset, {
-        baseOptions: {
-          modelAssetPath: request.options.modelAssetUrl,
-          delegate: "GPU",
-        },
-        runningMode: "VIDEO",
-        numPoses: 1,
-        minPoseDetectionConfidence:
-          request.options.minPoseDetectionConfidence ?? 0.5,
-        minPosePresenceConfidence:
-          request.options.minPosePresenceConfidence ?? 0.5,
-        minTrackingConfidence: request.options.minTrackingConfidence ?? 0.5,
-        outputSegmentationMasks: false,
-      });
+      const createLandmarker = (delegate: "GPU" | "CPU") =>
+        PoseLandmarker.createFromOptions(fileset, {
+          baseOptions: {
+            modelAssetPath: request.options.modelAssetUrl,
+            delegate,
+          },
+          runningMode: "VIDEO",
+          numPoses: 1,
+          minPoseDetectionConfidence:
+            request.options.minPoseDetectionConfidence ?? 0.5,
+          minPosePresenceConfidence:
+            request.options.minPosePresenceConfidence ?? 0.5,
+          minTrackingConfidence: request.options.minTrackingConfidence ?? 0.5,
+          outputSegmentationMasks: false,
+        });
+
+      try {
+        poseLandmarker = await createLandmarker("GPU");
+      } catch {
+        poseLandmarker = await createLandmarker("CPU");
+      }
 
       postResponse({ type: "READY", requestId: request.requestId });
       return;

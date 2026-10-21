@@ -9,6 +9,7 @@ interface PendingRequest {
 export class PoseWorkerClient {
   private readonly worker: Worker;
   private readonly pendingRequests = new Map<string, PendingRequest>();
+  private disposed = false;
 
   constructor() {
     this.worker = new Worker(
@@ -45,6 +46,8 @@ export class PoseWorkerClient {
   }
 
   dispose() {
+    if (this.disposed) return;
+    this.disposed = true;
     this.worker.removeEventListener("message", this.handleMessage);
     this.worker.removeEventListener("error", this.handleWorkerError);
     this.worker.terminate();
@@ -59,6 +62,10 @@ export class PoseWorkerClient {
     message: PoseWorkerRequest,
     transfer: Transferable[] = [],
   ): Promise<PoseFrame | null | undefined> {
+    if (this.disposed) {
+      return Promise.reject(new Error("Pose worker was stopped."));
+    }
+
     return new Promise((resolve, reject) => {
       this.pendingRequests.set(message.requestId, { resolve, reject });
       this.worker.postMessage(message, transfer);

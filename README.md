@@ -51,8 +51,11 @@ Video frames and raw pose landmarks remain in the browser. Only a reduced set of
 Implementation is in progress. The current foundation includes:
 
 - A responsive Next.js application shell.
-- A browser upload and bounded multi-frame pose-readiness benchmark.
+- A browser upload flow that produces a bounded, timestamped pose sequence.
 - MediaPipe inference isolated in a Web Worker.
+- Determinate processing progress with cancellation, retry, and resource cleanup.
+- Synchronized video playback with Canvas skeleton, hand-path, and body-line overlays.
+- Manual address, top, impact, and finish markers with tempo and image-space measurements.
 - A server-only OpenRouter adapter with runtime validation and a deterministic fallback.
 - Strict TypeScript, ESLint, Prettier, Vitest, and Playwright quality gates.
 
@@ -85,6 +88,8 @@ npm run build
 
 - [Implementation plan](docs/implementation-plan.md)
 - [Day 1 technical validation](docs/day-1-validation.md)
+- [Day 2 production pose pipeline](docs/day-2-production-pipeline.md)
+- [Day 3 review and measurement workspace](docs/day-3-review-and-measurements.md)
 
 ## License
 

@@ -1,4 +1,6 @@
 .next
+.impeccable/hook.cache.json
+.impeccable/questions
 docs/implementation-plan.md
 coverage
 node_modules
