@@ -236,5 +236,25 @@ export interface ReportResponse {
   report: SwingReport;
   candidates: ObservationCandidate[];
   source: "openrouter" | "deterministic-fallback";
-  fallbackReason?: "not-configured" | "provider-error" | "invalid-response";
+  fallbackReason?:
+    | "not-configured"
+    | "provider-error"
+    | "invalid-response"
+    | "quota-unavailable"
+    | "customer-limit"
+    | "global-limit";
+  allowance: {
+    limit: number;
+    remaining: number | null;
+    resetAt: string;
+    cacheHit: boolean;
+  };
+}
+
+export interface ReportAllowanceResponse {
+  aiAvailable: boolean;
+  quotaAvailable: boolean;
+  limit: number;
+  remaining: number | null;
+  resetAt: string;
 }
