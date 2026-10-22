@@ -38,6 +38,7 @@ export interface HandPathPoint {
   y: number;
   normalizedX: number;
   normalizedY: number;
+  confidence: MetricConfidence;
 }
 
 export interface MeasuredSwingRecord {
@@ -162,6 +163,14 @@ export function calculateHandPath(sequence: PoseSequence): HandPathPoint[] {
 
     const handMidpoint = midpoint(leftWrist, rightWrist);
     const hipMidpoint = midpoint(leftHip, rightHip);
+    const supportingLandmarks = [
+      leftWrist,
+      rightWrist,
+      leftShoulder,
+      rightShoulder,
+      leftHip,
+      rightHip,
+    ];
     const shoulderWidth = distance(leftShoulder, rightShoulder);
     if (shoulderWidth === 0) return [];
     return [
@@ -171,6 +180,7 @@ export function calculateHandPath(sequence: PoseSequence): HandPathPoint[] {
         y: handMidpoint.y,
         normalizedX: round((handMidpoint.x - hipMidpoint.x) / shoulderWidth, 3),
         normalizedY: round((hipMidpoint.y - handMidpoint.y) / shoulderWidth, 3),
+        confidence: confidenceFor(supportingLandmarks),
       },
     ];
   });

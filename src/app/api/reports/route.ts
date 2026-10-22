@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { buildObservationCandidates } from "@/report/candidate-builder";
 import { createDeterministicReport } from "@/report/deterministic-report";
 import {
   InvalidReportResponseError,
@@ -32,12 +33,21 @@ export async function POST(request: Request) {
     );
   }
 
-  const fallbackReport = createDeterministicReport(parsedInput.data);
+  const candidates = buildObservationCandidates(parsedInput.data);
+  if (candidates.length === 0) {
+    return NextResponse.json(
+      { error: "No reliable report observations could be produced." },
+      { status: 422 },
+    );
+  }
+
+  const fallbackReport = createDeterministicReport(candidates);
   const apiKey = process.env.OPENROUTER_API_KEY;
 
   if (!apiKey) {
     const response: ReportResponse = {
       report: fallbackReport,
+      candidates,
       source: "deterministic-fallback",
       fallbackReason: "not-configured",
     };
@@ -45,13 +55,18 @@ export async function POST(request: Request) {
   }
 
   try {
-    const report = await requestOpenRouterReport(parsedInput.data, apiKey);
-    const response: ReportResponse = { report, source: "openrouter" };
+    const report = await requestOpenRouterReport(candidates, apiKey);
+    const response: ReportResponse = {
+      report,
+      candidates,
+      source: "openrouter",
+    };
     return NextResponse.json(response);
   } catch (error) {
     console.error("OpenRouter report generation failed", error);
     const response: ReportResponse = {
       report: fallbackReport,
+      candidates,
       source: "deterministic-fallback",
       fallbackReason:
         error instanceof InvalidReportResponseError

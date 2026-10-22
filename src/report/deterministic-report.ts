@@ -1,43 +1,55 @@
-import type { AnalysisReportInput, SwingReport } from "./schema";
+import type {
+  CandidateCategory,
+  ObservationCandidate,
+  SwingReport,
+} from "./schema";
 
-const DISCLAIMER =
-  "This report describes visible body movement from one camera angle. It is not a diagnosis or a measure of swing quality.";
+export const REPORT_LIMITATIONS = [
+  "This is a descriptive single-camera, image-space analysis, not a diagnosis or a measure of swing quality.",
+  "Pose tracking can become less reliable when body parts are hidden, blurred, or outside the frame.",
+  "The hand path follows the tracked wrists; it does not measure the golf club, clubhead speed, or ball flight.",
+] as const;
 
 export function createDeterministicReport(
-  input: AnalysisReportInput,
+  candidates: ObservationCandidate[],
 ): SwingReport {
-  const selectedCandidates = input.candidates
-    .filter((candidate) => candidate.confidence !== "low")
-    .slice(0, 3);
-  const candidates =
-    selectedCandidates.length > 0
-      ? selectedCandidates
-      : input.candidates.slice(0, 1);
-
   return {
+    schemaVersion: 1,
     summary:
-      "Here are the clearest measured movements to review alongside your swing video.",
+      "These are the clearest measured movements to review alongside your swing video.",
     insights: candidates.map((candidate) => ({
       candidateId: candidate.id,
-      heading: categoryHeading(candidate.category),
-      explanation: `${candidate.observation} ${candidate.whyItMayMatter}`,
+      title: categoryHeading(candidate.category),
+      explanation: candidate.observation,
+      whyItMayMatter: candidate.approvedContext,
+      reviewAction: reviewAction(candidate),
     })),
-    disclaimer: DISCLAIMER,
+    limitations: [...REPORT_LIMITATIONS],
   };
 }
 
-function categoryHeading(
-  category: AnalysisReportInput["candidates"][number]["category"],
-) {
+function categoryHeading(category: CandidateCategory) {
   const headings = {
     tempo: "Swing timing",
-    pelvis: "Pelvis movement",
+    "pelvis-movement": "Pelvis movement",
     "arm-structure": "Arm structure",
     "lower-body": "Lower-body movement",
-    "body-lines": "Body position",
+    "body-tilt": "Body lines",
     "hand-path": "Hand path",
     "tracking-quality": "Tracking limitation",
-  } satisfies Record<typeof category, string>;
-
+  } satisfies Record<CandidateCategory, string>;
   return headings[category];
+}
+
+function reviewAction(candidate: ObservationCandidate) {
+  if (candidate.category === "tracking-quality") {
+    return "Review the skeleton overlay around the affected phases before relying on those measurements.";
+  }
+  if (candidate.phaseIds.length === 1) {
+    return `Review the video and measurements at ${candidate.phaseIds[0]}.`;
+  }
+  if (candidate.phaseIds.length > 1) {
+    return `Compare ${candidate.phaseIds.join(", ")} in the video and phase measurements.`;
+  }
+  return "Review this measurement alongside the tracked video.";
 }
