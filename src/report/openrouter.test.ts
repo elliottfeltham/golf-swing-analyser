@@ -112,4 +112,14 @@ describe("OpenRouter report grounding", () => {
       requestOpenRouterReport([TEMPO_CANDIDATE], "secret", malformed),
     ).rejects.toBeInstanceOf(InvalidReportResponseError);
   });
+
+  it("surfaces a provider timeout for the route to fall back", async () => {
+    const timedOut = vi
+      .fn<typeof fetch>()
+      .mockRejectedValue(new DOMException("Timed out", "TimeoutError"));
+
+    await expect(
+      requestOpenRouterReport([TEMPO_CANDIDATE], "secret", timedOut),
+    ).rejects.toMatchObject({ name: "TimeoutError" });
+  });
 });
