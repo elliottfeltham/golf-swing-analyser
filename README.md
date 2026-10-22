@@ -56,7 +56,9 @@ Implementation is in progress. The current foundation includes:
 - Determinate processing progress with cancellation, retry, and resource cleanup.
 - Synchronized video playback with Canvas skeleton, hand-path, and body-line overlays.
 - Manual address, top, impact, and finish markers with tempo and image-space measurements.
-- A server-only OpenRouter adapter with runtime validation and a deterministic fallback.
+- A server-owned observation engine that converts reduced measurements into ranked, evidence-linked candidates.
+- A constrained OpenRouter adapter with structured output, claim validation, and a matching deterministic fallback.
+- Twelve fixed report-evaluation scenarios covering tracking gaps, handedness, optional phases, and dominant movement categories.
 - Strict TypeScript, ESLint, Prettier, Vitest, and Playwright quality gates.
 
 The full approved plan is available in [docs/implementation-plan.md](docs/implementation-plan.md).
@@ -90,6 +92,8 @@ npm run build
 - [Day 1 technical validation](docs/day-1-validation.md)
 - [Day 2 production pose pipeline](docs/day-2-production-pipeline.md)
 - [Day 3 review and measurement workspace](docs/day-3-review-and-measurements.md)
+- [Day 4 grounded AI report pipeline](docs/day-4-grounded-ai-reports.md)
+- [ADR 001: server-owned evidence boundary](docs/adr/001-server-owned-report-evidence.md)
 
 ## License
 
