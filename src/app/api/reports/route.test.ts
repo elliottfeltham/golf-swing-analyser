@@ -1,6 +1,8 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildObservationCandidates } from "@/report/candidate-builder";
+import { createDeterministicReport } from "@/report/deterministic-report";
+import type { ReportResponse } from "@/report/schema";
 import { BASE_REPORT_INPUT } from "@/report/test-fixtures";
 
 const quota = vi.hoisted(() => ({
@@ -204,6 +206,33 @@ describe("POST /api/reports", () => {
     const body = await response.json();
     expect(body.fallbackReason).toBe("customer-limit");
     expect(body.allowance.remaining).toBe(0);
+    expect(fetcher).not.toHaveBeenCalled();
+  });
+
+  it("returns an unchanged cached analysis without consuming allowance", async () => {
+    vi.stubEnv("OPENROUTER_API_KEY", "secret");
+    vi.stubEnv("QUOTA_HMAC_SECRET", "quota-secret");
+    const candidates = buildObservationCandidates(BASE_REPORT_INPUT);
+    const cached: ReportResponse = {
+      report: createDeterministicReport(candidates),
+      candidates,
+      source: "openrouter",
+      allowance: {
+        limit: 5,
+        remaining: 3,
+        resetAt: "2026-10-23T00:00:00.000Z",
+        cacheHit: false,
+      },
+    };
+    quota.store.getCachedReport.mockResolvedValue(cached);
+    const fetcher = vi.fn();
+    vi.stubGlobal("fetch", fetcher);
+
+    const response = await POST(request(BASE_REPORT_INPUT));
+    const body = await response.json();
+    expect(body.source).toBe("openrouter");
+    expect(body.allowance).toMatchObject({ remaining: 5, cacheHit: true });
+    expect(quota.store.reserve).not.toHaveBeenCalled();
     expect(fetcher).not.toHaveBeenCalled();
   });
 });

@@ -49,8 +49,8 @@ export default function HomePage() {
               <li>
                 <span>02</span>
                 <p>
-                  <strong>Show the full body.</strong> Hands, feet, and club
-                  path need room to stay inside the frame.
+                  <strong>Show the full body.</strong> Keep the hands, feet, and
+                  complete swing motion inside the frame.
                 </p>
               </li>
               <li>

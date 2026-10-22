@@ -37,4 +37,30 @@ test("builds a production pose sequence from the golf fixture", async ({
     page.getByText("Lead elbow", { exact: true }).first(),
   ).toBeVisible();
   await expect(page.getByLabel("Lead elbow chart")).toBeVisible();
+
+  const frameRange = page.getByRole("slider", { name: "Analysed frame" });
+  const maximum = Number(await frameRange.getAttribute("max"));
+  await frameRange.fill(String(Math.max(1, Math.floor(maximum / 2))));
+  await page
+    .locator(".phase-marker-panel li")
+    .nth(1)
+    .getByRole("button")
+    .click();
+  await frameRange.fill(String(Math.max(2, Math.floor((maximum * 3) / 4))));
+  await page
+    .locator(".phase-marker-panel li")
+    .nth(2)
+    .getByRole("button")
+    .click();
+
+  await expect(
+    page.getByRole("heading", { name: "Written swing review" }),
+  ).toBeVisible();
+  await page.getByRole("checkbox", { name: /I agree to send/i }).check();
+  await page
+    .getByRole("button", { name: /written review/i })
+    .last()
+    .click();
+  await expect(page.getByText("Evidence-led local review")).toBeVisible();
+  await expect(page.getByRole("article").first()).toBeVisible();
 });

@@ -21,6 +21,9 @@ import {
   type PhaseMarkers,
 } from "@/analysis/measurements";
 import type { PoseFrame, PoseSequence } from "@/pose/types";
+import { buildAnalysisReportInput } from "@/report/build-report-input";
+import type { ObservationCandidate } from "@/report/schema";
+import { SwingReportPanel } from "@/components/swing-report-panel";
 
 const PHASES: Array<{ id: PhaseId; label: string; optional?: boolean }> = [
   { id: "address", label: "Address" },
@@ -55,6 +58,7 @@ export function SwingReview({
   sequence: PoseSequence;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const mediaColumnRef = useRef<HTMLDivElement>(null);
   const animationFrameRef = useRef<number>(undefined);
   const firstDetectedIndex = Math.max(
     0,
@@ -82,6 +86,10 @@ export function SwingReview({
   const chartData = useMemo(
     () => createMetricSeries(sequence, chartMetric, handedness),
     [sequence, chartMetric, handedness],
+  );
+  const reportInput = useMemo(
+    () => buildAnalysisReportInput(record, sequence.usablePoseFramePercent),
+    [record, sequence.usablePoseFramePercent],
   );
 
   useEffect(() => {
@@ -138,6 +146,23 @@ export function SwingReview({
     }
   }
 
+  function reviewEvidence(candidate: ObservationCandidate) {
+    const phase = candidate.phaseIds[0];
+    const timestamp = phase ? markers[phase] : undefined;
+    if (timestamp !== undefined) {
+      seekToFrame(nearestFrameIndex(sequence, timestamp));
+    }
+    const chartMetric = candidate.metricIds.find((metricId) =>
+      CHART_METRICS.some(({ id }) => id === metricId),
+    );
+    if (chartMetric) setChartMetric(chartMetric as MetricId);
+    mediaColumnRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+    mediaColumnRef.current?.focus({ preventScroll: true });
+  }
+
   return (
     <section className="review-workspace" aria-labelledby="review-heading">
       <header className="review-heading">
@@ -156,7 +181,7 @@ export function SwingReview({
       </header>
 
       <div className="review-grid">
-        <div className="media-column">
+        <div className="media-column" ref={mediaColumnRef} tabIndex={-1}>
           <div
             className="media-stage"
             style={{ aspectRatio: String(sequence.metadata.aspectRatio) }}
@@ -397,6 +422,12 @@ export function SwingReview({
         Angles, tilts, and paths are single-camera image-space observations—not
         full 3D rotation, club tracking, clubhead speed, or swing diagnosis.
       </p>
+
+      <SwingReportPanel
+        key={reportInput ? JSON.stringify(reportInput) : "incomplete"}
+        input={reportInput}
+        onReviewEvidence={reviewEvidence}
+      />
     </section>
   );
 }

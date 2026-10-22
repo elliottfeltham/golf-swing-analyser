@@ -63,12 +63,29 @@ describe("anonymous report identity", () => {
     const request = new Request("https://example.com", {
       headers: { "x-forwarded-for": "203.0.113.8, 10.0.0.1" },
     });
-    const first = identifyCustomer(request, "secret");
-    const second = identifyCustomer(request, "secret");
+    const first = identifyCustomer(
+      request,
+      "secret",
+      new Date("2026-10-22T12:00:00Z"),
+    );
+    const second = identifyCustomer(
+      request,
+      "secret",
+      new Date("2026-10-22T22:00:00Z"),
+    );
 
     expect(first).toBe(second);
     expect(first).not.toContain("203.0.113.8");
-    expect(identifyCustomer(request, "another-secret")).not.toBe(first);
+    expect(
+      identifyCustomer(
+        request,
+        "another-secret",
+        new Date("2026-10-22T12:00:00Z"),
+      ),
+    ).not.toBe(first);
+    expect(
+      identifyCustomer(request, "secret", new Date("2026-10-23T12:00:00Z")),
+    ).not.toBe(first);
   });
 
   it("hashes identical reduced analyses consistently", () => {

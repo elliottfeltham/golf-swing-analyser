@@ -232,29 +232,41 @@ export type ObservationCandidate = z.infer<typeof ObservationCandidateSchema>;
 export type GeneratedReport = z.infer<typeof GeneratedReportSchema>;
 export type SwingReport = z.infer<typeof SwingReportSchema>;
 
-export interface ReportResponse {
-  report: SwingReport;
-  candidates: ObservationCandidate[];
-  source: "openrouter" | "deterministic-fallback";
-  fallbackReason?:
-    | "not-configured"
-    | "provider-error"
-    | "invalid-response"
-    | "quota-unavailable"
-    | "customer-limit"
-    | "global-limit";
-  allowance: {
-    limit: number;
-    remaining: number | null;
-    resetAt: string;
-    cacheHit: boolean;
-  };
-}
+export const ReportAllowanceSchema = z
+  .object({
+    aiAvailable: z.boolean(),
+    quotaAvailable: z.boolean(),
+    limit: z.number().int().positive(),
+    remaining: z.number().int().nonnegative().nullable(),
+    resetAt: z.iso.datetime(),
+  })
+  .strict();
 
-export interface ReportAllowanceResponse {
-  aiAvailable: boolean;
-  quotaAvailable: boolean;
-  limit: number;
-  remaining: number | null;
-  resetAt: string;
-}
+export const ReportResponseSchema = z
+  .object({
+    report: SwingReportSchema,
+    candidates: z.array(ObservationCandidateSchema).min(1).max(4),
+    source: z.enum(["openrouter", "deterministic-fallback"]),
+    fallbackReason: z
+      .enum([
+        "not-configured",
+        "provider-error",
+        "invalid-response",
+        "quota-unavailable",
+        "customer-limit",
+        "global-limit",
+      ])
+      .optional(),
+    allowance: z
+      .object({
+        limit: z.number().int().positive(),
+        remaining: z.number().int().nonnegative().nullable(),
+        resetAt: z.iso.datetime(),
+        cacheHit: z.boolean(),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type ReportResponse = z.infer<typeof ReportResponseSchema>;
+export type ReportAllowanceResponse = z.infer<typeof ReportAllowanceSchema>;

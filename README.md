@@ -59,6 +59,8 @@ Implementation is in progress. The current foundation includes:
 - A server-owned observation engine that converts reduced measurements into ranked, evidence-linked candidates.
 - A constrained OpenRouter adapter with structured output, claim validation, and a matching deterministic fallback.
 - Twelve fixed report-evaluation scenarios covering tracking gaps, handedness, optional phases, and dominant movement categories.
+- Explicit report consent, evidence-linked written insights, local feedback, and responsive report states.
+- Atomic five-per-customer and 45-global daily AI limits with cached responses through Upstash Redis.
 - Strict TypeScript, ESLint, Prettier, Vitest, and Playwright quality gates.
 
 The full approved plan is available in [docs/implementation-plan.md](docs/implementation-plan.md).
@@ -74,6 +76,8 @@ npm run dev
 ```
 
 The application works without an OpenRouter key by returning its deterministic report. Add `OPENROUTER_API_KEY` to `.env.local` to exercise live AI generation; the key is read only by the server route.
+
+Production AI generation also requires `UPSTASH_REDIS_REST_URL`, `UPSTASH_REDIS_REST_TOKEN`, and a private `QUOTA_HMAC_SECRET`. Without quota storage, the application deliberately uses the deterministic report rather than making an unmetered model request.
 
 Run the quality gates with:
 
@@ -93,6 +97,7 @@ npm run build
 - [Day 2 production pose pipeline](docs/day-2-production-pipeline.md)
 - [Day 3 review and measurement workspace](docs/day-3-review-and-measurements.md)
 - [Day 4 grounded AI report pipeline](docs/day-4-grounded-ai-reports.md)
+- [Day 5 report experience and quotas](docs/day-5-report-experience.md)
 - [ADR 001: server-owned evidence boundary](docs/adr/001-server-owned-report-evidence.md)
 
 ## License

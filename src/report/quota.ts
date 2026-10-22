@@ -154,14 +154,19 @@ export function createReportQuotaStoreFromEnv(): ReportQuotaStore | null {
   return new ReportQuotaStore(new Redis({ url, token }), globalLimit);
 }
 
-export function identifyCustomer(request: Request, secret: string) {
+export function identifyCustomer(
+  request: Request,
+  secret: string,
+  now = new Date(),
+) {
   const forwarded =
     request.headers.get("x-vercel-forwarded-for") ??
     request.headers.get("x-forwarded-for") ??
     request.headers.get("x-real-ip") ??
     "local-or-unknown";
   const ip = forwarded.split(",")[0]!.trim();
-  return createHmac("sha256", secret).update(ip).digest("hex");
+  const dateKey = now.toISOString().slice(0, 10);
+  return createHmac("sha256", secret).update(`${dateKey}:${ip}`).digest("hex");
 }
 
 export function hashAnalysis(input: AnalysisReportInput) {

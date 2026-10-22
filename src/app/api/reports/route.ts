@@ -19,6 +19,7 @@ import {
   AnalysisReportInputSchema,
   type ReportAllowanceResponse,
   type ReportResponse,
+  ReportResponseSchema,
 } from "@/report/schema";
 
 interface ReportRouteDependencies {
@@ -59,7 +60,7 @@ async function getAllowance(
     remaining: null,
     resetAt: nextUtcReset(now).toISOString(),
   };
-  const context = quotaContext(request, dependencies);
+  const context = quotaContext(request, dependencies, now);
   if (!context) return NextResponse.json(unavailable);
 
   try {
@@ -128,7 +129,7 @@ async function createReport(
     } satisfies ReportResponse);
   }
 
-  const context = quotaContext(request, dependencies);
+  const context = quotaContext(request, dependencies, now);
   if (!context) {
     return NextResponse.json({
       report: fallbackReport,
@@ -144,10 +145,11 @@ async function createReport(
   try {
     allowance = await context.store.getAllowance(context.customerId, now);
     const cached = await context.store.getCachedReport(analysisHash);
-    if (cached?.source === "openrouter") {
+    const parsedCached = ReportResponseSchema.safeParse(cached);
+    if (parsedCached.success && parsedCached.data.source === "openrouter") {
       return NextResponse.json({
-        ...cached,
-        allowance: { ...allowance, cacheHit: true },
+        ...parsedCached.data,
+        allowance: responseAllowance(allowance, true),
       } satisfies ReportResponse);
     }
   } catch (error) {
@@ -181,7 +183,7 @@ async function createReport(
       candidates,
       source: "deterministic-fallback",
       fallbackReason: reservation.reason,
-      allowance: { ...reservation, cacheHit: false },
+      allowance: responseAllowance(reservation, false),
     } satisfies ReportResponse);
   }
 
@@ -191,7 +193,7 @@ async function createReport(
       report,
       candidates,
       source: "openrouter",
-      allowance: { ...reservation, cacheHit: false },
+      allowance: responseAllowance(reservation, false),
     };
     try {
       await context.store.cacheReport(analysisHash, response);
@@ -217,18 +219,33 @@ async function createReport(
         error instanceof InvalidReportResponseError
           ? "invalid-response"
           : "provider-error",
-      allowance: {
-        ...reservation,
-        remaining: Math.min(reservation.limit, reservation.remaining + 1),
-        cacheHit: false,
-      },
+      allowance: responseAllowance(
+        {
+          ...reservation,
+          remaining: Math.min(reservation.limit, reservation.remaining + 1),
+        },
+        false,
+      ),
     } satisfies ReportResponse);
   }
 }
 
-function quotaContext(request: Request, dependencies: ReportRouteDependencies) {
+function quotaContext(
+  request: Request,
+  dependencies: ReportRouteDependencies,
+  now: Date,
+) {
   const store = dependencies.createQuotaStore();
   const secret = process.env.QUOTA_HMAC_SECRET;
   if (!store || !secret) return null;
-  return { store, customerId: identifyCustomer(request, secret) };
+  return { store, customerId: identifyCustomer(request, secret, now) };
+}
+
+function responseAllowance(status: AllowanceStatus, cacheHit: boolean) {
+  return {
+    limit: status.limit,
+    remaining: status.remaining,
+    resetAt: status.resetAt,
+    cacheHit,
+  };
 }
