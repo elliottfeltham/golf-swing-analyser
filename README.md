@@ -62,6 +62,9 @@ Implementation is in progress. The current foundation includes:
 - Explicit report consent, evidence-linked written insights, local feedback, and responsive report states.
 - Atomic five-per-customer and 45-global daily AI limits with cached responses through Upstash Redis.
 - Strict TypeScript, ESLint, Prettier, Vitest, and Playwright quality gates.
+- Desktop and mobile browser projects, API body hardening, client-secret
+  scanning, local processing diagnostics, and documented live-provider
+  evaluation.
 
 The full approved plan is available in [docs/implementation-plan.md](docs/implementation-plan.md).
 
@@ -86,8 +89,10 @@ npm run format:check
 npm run lint
 npm run typecheck
 npm run test:run
+npm run test:coverage
 npm run test:e2e
 npm run build
+npm run security:check-client
 ```
 
 ## Documentation
@@ -98,6 +103,7 @@ npm run build
 - [Day 3 review and measurement workspace](docs/day-3-review-and-measurements.md)
 - [Day 4 grounded AI report pipeline](docs/day-4-grounded-ai-reports.md)
 - [Day 5 report experience and quotas](docs/day-5-report-experience.md)
+- [Day 6 compatibility, security, and evaluation](docs/day-6-quality-evaluation.md)
 - [ADR 001: server-owned evidence boundary](docs/adr/001-server-owned-report-evidence.md)
 
 ## License
