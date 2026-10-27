@@ -48,6 +48,7 @@ interface ProcessVideoDependencies {
     signal: AbortSignal,
   ) => Promise<void>;
   assetOrigin: () => string;
+  now: () => number;
 }
 
 const defaultDependencies: ProcessVideoDependencies = {
@@ -60,6 +61,7 @@ const defaultDependencies: ProcessVideoDependencies = {
     }),
   seek: seekVideo,
   assetOrigin: () => window.location.origin,
+  now: () => performance.now(),
 };
 
 export async function processVideo(
@@ -75,6 +77,8 @@ export async function processVideo(
   const client = dependencies.createClient();
   const frames: PoseSequence["frames"] = [];
   const totalFrames = timestamps.length;
+  const inferenceDurations: number[] = [];
+  const processingStartedAt = dependencies.now();
 
   const abortClient = () => client.dispose();
   options.signal.addEventListener("abort", abortClient, { once: true });
@@ -88,10 +92,12 @@ export async function processVideo(
     });
 
     const origin = dependencies.assetOrigin();
+    const modelLoadStartedAt = dependencies.now();
     await client.initialise({
       wasmBaseUrl: `${origin}/mediapipe/wasm`,
       modelAssetUrl: `${origin}/mediapipe/models/pose_landmarker_lite.task`,
     });
+    const modelLoadMs = dependencies.now() - modelLoadStartedAt;
     throwIfAborted(options.signal);
 
     options.onProgress({
@@ -114,7 +120,9 @@ export async function processVideo(
       let pose: PoseFrame | null;
 
       try {
+        const inferenceStartedAt = dependencies.now();
         pose = await client.analyseFrame(frame, timestampMs);
+        inferenceDurations.push(dependencies.now() - inferenceStartedAt);
       } catch (error) {
         if (options.signal.aborted) throw new PoseProcessingCancelledError();
         throw error;
@@ -143,6 +151,14 @@ export async function processVideo(
         totalFrames === 0
           ? 0
           : Math.round((detectedFrameCount / totalFrames) * 1_000) / 10,
+      diagnostics: {
+        modelLoadMs: roundDuration(modelLoadMs),
+        totalProcessingMs: roundDuration(
+          dependencies.now() - processingStartedAt,
+        ),
+        medianInferenceMs: roundDuration(percentile(inferenceDurations, 0.5)),
+        p95InferenceMs: roundDuration(percentile(inferenceDurations, 0.95)),
+      },
     };
 
     options.onProgress({
@@ -156,6 +172,20 @@ export async function processVideo(
     options.signal.removeEventListener("abort", abortClient);
     client.dispose();
   }
+}
+
+function percentile(values: number[], quantile: number) {
+  if (values.length === 0) return 0;
+  const sorted = [...values].sort((left, right) => left - right);
+  const index = Math.min(
+    sorted.length - 1,
+    Math.max(0, Math.ceil(sorted.length * quantile) - 1),
+  );
+  return sorted[index]!;
+}
+
+function roundDuration(value: number) {
+  return Math.round(value * 10) / 10;
 }
 
 export function isPoseProcessingCancelled(error: unknown) {

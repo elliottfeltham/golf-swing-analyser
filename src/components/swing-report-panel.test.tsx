@@ -138,4 +138,77 @@ describe("SwingReportPanel", () => {
     );
     expect(localStorage.getItem("gsa-report-feedback")).toContain("useful");
   });
+
+  it.each([
+    ["global-limit", /shared AI capacity has been reached/i],
+    ["quota-unavailable", /allowance service is unavailable/i],
+    ["provider-error", /could not be safely verified/i],
+    ["invalid-response", /could not be safely verified/i],
+  ] as const)("explains the %s fallback", async (fallbackReason, message) => {
+    const fallback: ReportResponse = {
+      ...reportResponse,
+      source: "deterministic-fallback",
+      fallbackReason,
+      allowance: {
+        ...reportResponse.allowance,
+        remaining: fallbackReason === "global-limit" ? 5 : null,
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) =>
+        init?.method === "POST"
+          ? Response.json(fallback)
+          : Response.json({
+              aiAvailable: true,
+              quotaAvailable: true,
+              limit: 5,
+              remaining: 5,
+              resetAt: "2026-10-23T00:00:00.000Z",
+            }),
+      ),
+    );
+
+    render(
+      <SwingReportPanel
+        input={BASE_REPORT_INPUT}
+        onReviewEvidence={() => undefined}
+      />,
+    );
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /written review/i }));
+
+    await screen.findByText("Evidence-led local review");
+    expect(screen.getByText(message)).toBeVisible();
+  });
+
+  it("identifies a cached AI response", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (_input: RequestInfo | URL, init?: RequestInit) =>
+        init?.method === "POST"
+          ? Response.json({
+              ...reportResponse,
+              allowance: { ...reportResponse.allowance, cacheHit: true },
+            })
+          : Response.json({
+              aiAvailable: true,
+              quotaAvailable: true,
+              limit: 5,
+              remaining: 5,
+              resetAt: "2026-10-23T00:00:00.000Z",
+            }),
+      ),
+    );
+
+    render(
+      <SwingReportPanel
+        input={BASE_REPORT_INPUT}
+        onReviewEvidence={() => undefined}
+      />,
+    );
+    fireEvent.click(screen.getByRole("checkbox"));
+    fireEvent.click(screen.getByRole("button", { name: /written review/i }));
+    expect(await screen.findByText("AI review · cached")).toBeVisible();
+  });
 });

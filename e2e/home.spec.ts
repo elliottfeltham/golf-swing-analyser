@@ -1,7 +1,14 @@
 import { expect, test } from "@playwright/test";
 
 test("presents the product purpose and privacy promise", async ({ page }) => {
-  await page.goto("/");
+  const response = await page.goto("/");
+
+  expect(response?.headers()).toMatchObject({
+    "x-content-type-options": "nosniff",
+    "x-frame-options": "DENY",
+    "referrer-policy": "strict-origin-when-cross-origin",
+    "permissions-policy": "camera=(), microphone=(), geolocation=()",
+  });
 
   await expect(
     page.getByRole("heading", {

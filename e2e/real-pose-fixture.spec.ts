@@ -11,6 +11,16 @@ test("builds a production pose sequence from the golf fixture", async ({
   page,
 }) => {
   test.setTimeout(240_000);
+  const externalBrowserRequests: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (
+      url.protocol.startsWith("http") &&
+      url.origin !== "http://127.0.0.1:3000"
+    ) {
+      externalBrowserRequests.push(request.url());
+    }
+  });
   await page.goto("/");
 
   await page
@@ -24,6 +34,16 @@ test("builds a production pose sequence from the golf fixture", async ({
   ).toBeVisible({ timeout: 220_000 });
   await expect(page.getByText("Pose frames", { exact: true })).toBeVisible();
   await expect(page.getByText("Availability", { exact: true })).toBeVisible();
+  const diagnostics = await page
+    .locator(".sequence-summary")
+    .evaluate((element) => ({
+      modelLoadMs: element.getAttribute("data-model-load-ms"),
+      totalProcessingMs: element.getAttribute("data-total-processing-ms"),
+      medianInferenceMs: element.getAttribute("data-median-inference-ms"),
+      p95InferenceMs: element.getAttribute("data-p95-inference-ms"),
+    }));
+  console.info(`[real-pose-diagnostics] ${JSON.stringify(diagnostics)}`);
+  expect(externalBrowserRequests).toEqual([]);
   await expect(
     page.getByRole("heading", { name: "Review the movement." }),
   ).toBeVisible();

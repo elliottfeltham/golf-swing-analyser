@@ -188,7 +188,7 @@ export function SwingReview({
           >
             <video
               ref={videoRef}
-              src={objectUrl}
+              src={objectUrl || undefined}
               muted
               playsInline
               preload="auto"
@@ -614,6 +614,16 @@ function PhaseRail({
   currentTimestamp: number;
   onSelect: (timestampMs: number) => void;
 }) {
+  const selectedRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    selectedRef.current?.scrollIntoView({
+      behavior: "auto",
+      block: "nearest",
+      inline: "nearest",
+    });
+  }, [currentTimestamp, markers]);
+
   return (
     <nav className="phase-rail" aria-label="Marked swing phases">
       {PHASES.map((phase, index) => {
@@ -621,6 +631,7 @@ function PhaseRail({
         const selected = timestamp === currentTimestamp;
         return (
           <button
+            ref={selected ? selectedRef : undefined}
             type="button"
             key={phase.id}
             disabled={timestamp === undefined}

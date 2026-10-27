@@ -89,6 +89,12 @@ function makeSequence(): PoseSequence {
     })),
     detectedFrameCount: 4,
     usablePoseFramePercent: 100,
+    diagnostics: {
+      modelLoadMs: 0,
+      totalProcessingMs: 0,
+      medianInferenceMs: 0,
+      p95InferenceMs: 0,
+    },
   };
 }
 

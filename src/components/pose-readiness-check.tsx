@@ -347,7 +347,13 @@ function SequenceSummary({
 }) {
   const { sequence } = state;
   return (
-    <dl className="sequence-summary">
+    <dl
+      className="sequence-summary"
+      data-model-load-ms={sequence.diagnostics.modelLoadMs}
+      data-total-processing-ms={sequence.diagnostics.totalProcessingMs}
+      data-median-inference-ms={sequence.diagnostics.medianInferenceMs}
+      data-p95-inference-ms={sequence.diagnostics.p95InferenceMs}
+    >
       <div>
         <dt>Pose frames</dt>
         <dd>
@@ -368,8 +374,18 @@ function SequenceSummary({
           {sequence.metadata.width} × {sequence.metadata.height}
         </dd>
       </div>
+      <div>
+        <dt>Processing</dt>
+        <dd>{formatDuration(sequence.diagnostics.totalProcessingMs)}</dd>
+      </div>
     </dl>
   );
+}
+
+function formatDuration(durationMs: number) {
+  return durationMs < 1_000
+    ? `${Math.round(durationMs)} ms`
+    : `${(durationMs / 1_000).toFixed(1)} s`;
 }
 
 function ProgressRail({ state }: { state: AnalysisState }) {

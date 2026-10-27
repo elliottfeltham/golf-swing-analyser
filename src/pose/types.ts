@@ -33,6 +33,14 @@ export interface PoseSequence {
   frames: PoseSample[];
   detectedFrameCount: number;
   usablePoseFramePercent: number;
+  diagnostics: ProcessingDiagnostics;
+}
+
+export interface ProcessingDiagnostics {
+  modelLoadMs: number;
+  totalProcessingMs: number;
+  medianInferenceMs: number;
+  p95InferenceMs: number;
 }
 
 export type ProcessingStage =

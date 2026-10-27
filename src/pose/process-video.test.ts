@@ -46,6 +46,7 @@ describe("processVideo", () => {
         createFrame: vi.fn().mockResolvedValue({} as ImageBitmap),
         seek: vi.fn().mockResolvedValue(undefined),
         assetOrigin: () => "https://example.test",
+        now: () => performance.now(),
       },
     );
 
@@ -68,6 +69,12 @@ describe("processVideo", () => {
       percent: 100,
     });
     expect(dispose).toHaveBeenCalledOnce();
+    expect(sequence.diagnostics).toEqual({
+      modelLoadMs: expect.any(Number),
+      totalProcessingMs: expect.any(Number),
+      medianInferenceMs: expect.any(Number),
+      p95InferenceMs: expect.any(Number),
+    });
   });
 
   it("stops before frame inference when cancelled", async () => {
@@ -94,6 +101,7 @@ describe("processVideo", () => {
           createFrame: vi.fn(),
           seek: vi.fn(),
           assetOrigin: () => "https://example.test",
+          now: () => performance.now(),
         },
       ),
     ).rejects.toBeInstanceOf(PoseProcessingCancelledError);

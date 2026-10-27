@@ -6,6 +6,7 @@ import {
   AnalysisReportInputSchema,
   ObservationCandidateSchema,
 } from "./schema";
+import { createDeterministicReport } from "./deterministic-report";
 
 describe("report evaluation fixtures", () => {
   it("contains twelve named, valid measurement scenarios", () => {
@@ -44,6 +45,13 @@ describe("report evaluation fixtures", () => {
           expect(candidate.confidence).not.toBe("low");
         }
       }
+
+      const report = createDeterministicReport(candidates);
+      expect(report.insights.map(({ candidateId }) => candidateId)).toEqual(
+        candidates.map(({ id }) => id),
+      );
+      expect(report.limitations.join(" ")).toMatch(/single-camera/i);
+      expect(report.limitations.join(" ")).toMatch(/clubhead speed/i);
     },
   );
 });
