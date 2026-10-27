@@ -12,6 +12,7 @@
     "dev": "next dev",
     "prebuild": "npm run assets:sync",
     "build": "next build --webpack",
+    "security:check-client": "node scripts/check-client-secrets.mjs",
     "start": "next start",
     "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc --noEmit",

@@ -1,0 +1,1 @@
+export const MAX_REPORT_REQUEST_BYTES = 32 * 1024;

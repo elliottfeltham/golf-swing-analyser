@@ -23,8 +23,9 @@ jobs:
       - run: npm run format:check
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run test:run
+      - run: npm run test:coverage
       - run: npm run build
+      - run: npm run security:check-client
 
   e2e:
     runs-on: ubuntu-latest

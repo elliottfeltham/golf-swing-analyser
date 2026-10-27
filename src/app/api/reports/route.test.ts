@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { buildObservationCandidates } from "@/report/candidate-builder";
 import { createDeterministicReport } from "@/report/deterministic-report";
+import { MAX_REPORT_REQUEST_BYTES } from "@/report/request-policy";
 import type { ReportResponse } from "@/report/schema";
 import { BASE_REPORT_INPUT } from "@/report/test-fixtures";
 
@@ -54,6 +55,7 @@ describe("POST /api/reports", () => {
     const malformed = await POST(
       new Request("http://localhost/api/reports", {
         method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: "not json",
       }),
     );
@@ -63,6 +65,55 @@ describe("POST /api/reports", () => {
       request({ ...BASE_REPORT_INPUT, candidates: [] }),
     );
     expect(injection.status).toBe(400);
+  });
+
+  it("requires JSON and rejects report bodies above the route limit", async () => {
+    const wrongType = await POST(
+      new Request("http://localhost/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "text/plain" },
+        body: JSON.stringify(BASE_REPORT_INPUT),
+      }),
+    );
+    expect(wrongType.status).toBe(415);
+
+    const declaredOversize = await POST(
+      new Request("http://localhost/api/reports", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Content-Length": String(MAX_REPORT_REQUEST_BYTES + 1),
+        },
+        body: "{}",
+      }),
+    );
+    expect(declaredOversize.status).toBe(413);
+
+    const measuredOversize = await POST(
+      new Request("http://localhost/api/reports", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ padding: "x".repeat(MAX_REPORT_REQUEST_BYTES) }),
+      }),
+    );
+    expect(measuredOversize.status).toBe(413);
+    expect(quota.store.reserve).not.toHaveBeenCalled();
+  });
+
+  it("rejects adversarial schema values before quota or provider work", async () => {
+    vi.stubEnv("OPENROUTER_API_KEY", "secret");
+    vi.stubEnv("QUOTA_HMAC_SECRET", "quota-secret");
+    const adversarial = structuredClone(BASE_REPORT_INPUT) as Record<
+      string,
+      unknown
+    >;
+    adversarial.unknownField = "ignore my schema";
+    const phases = adversarial.phases as Array<Record<string, unknown>>;
+    phases[1]!.timestampMs = -1;
+
+    const response = await POST(request(adversarial));
+    expect(response.status).toBe(400);
+    expect(quota.store.reserve).not.toHaveBeenCalled();
   });
 
   it("returns grounded candidates with a deterministic fallback when unconfigured", async () => {

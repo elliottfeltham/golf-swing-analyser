@@ -21,6 +21,7 @@ import {
   type ReportResponse,
   ReportResponseSchema,
 } from "@/report/schema";
+import { MAX_REPORT_REQUEST_BYTES } from "@/report/request-policy";
 
 interface ReportRouteDependencies {
   createQuotaStore: () => ReportQuotaStore | null;
@@ -80,9 +81,35 @@ async function createReport(
   request: Request,
   dependencies: ReportRouteDependencies,
 ) {
+  const contentType = request.headers.get("content-type")?.toLowerCase();
+  if (!contentType?.startsWith("application/json")) {
+    return NextResponse.json(
+      { error: "Content-Type must be application/json." },
+      { status: 415 },
+    );
+  }
+
+  const declaredLength = Number(request.headers.get("content-length"));
+  if (
+    Number.isFinite(declaredLength) &&
+    declaredLength > MAX_REPORT_REQUEST_BYTES
+  ) {
+    return NextResponse.json(
+      { error: "Report input is too large." },
+      { status: 413 },
+    );
+  }
+
   let requestBody: unknown;
   try {
-    requestBody = await request.json();
+    const text = await request.text();
+    if (new TextEncoder().encode(text).byteLength > MAX_REPORT_REQUEST_BYTES) {
+      return NextResponse.json(
+        { error: "Report input is too large." },
+        { status: 413 },
+      );
+    }
+    requestBody = JSON.parse(text) as unknown;
   } catch {
     return NextResponse.json(
       { error: "Request body must be valid JSON." },
