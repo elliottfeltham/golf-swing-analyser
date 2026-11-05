@@ -123,7 +123,3 @@ npm run security:check-client
 - [Day 5 report experience and quotas](docs/day-5-report-experience.md)
 - [Day 6 compatibility, security, and evaluation](docs/day-6-quality-evaluation.md)
 - [ADR 001: server-owned evidence boundary](docs/adr/001-server-owned-report-evidence.md)
-
-## License
-
-Released under the [MIT License](LICENSE).
