@@ -4,7 +4,9 @@ Golf Swing Analyser is an AI-assisted web application that helps golfers review 
 
 The project is being built as a production-quality portfolio application, with an emphasis on maintainable architecture, honest computer-vision limitations, automated testing, accessibility, privacy, and deployment.
 
-## Planned experience
+![Golf Swing Analyser desktop interface](.impeccable/review/desktop.png)
+
+## Current experience
 
 - Upload a short face-on golf-swing video.
 - Process the video locally with MediaPipe Pose Landmarker.
@@ -34,7 +36,7 @@ flowchart LR
 
 Video frames and raw pose landmarks remain in the browser. Only a reduced set of anonymous measurements, phase timings, and confidence information is sent to the report API. The language model selects and explains precomputed observation candidates; it does not invent or modify the underlying evidence.
 
-## Planned technology
+## Technology
 
 - Next.js, React, and strict TypeScript
 - Tailwind CSS
@@ -67,6 +69,22 @@ Implementation is in progress. The current foundation includes:
   evaluation.
 
 The full approved plan is available in [docs/implementation-plan.md](docs/implementation-plan.md).
+
+## Privacy and limitations
+
+- Uploaded video, decoded frames, and raw pose landmarks stay in the browser.
+- The optional report request contains derived measurements and confidence data,
+  not the source video.
+- Pose estimates are image-space observations from a single camera. They are not
+  calibrated biomechanics and should not be treated as medical or professional
+  coaching advice.
+- The application does not estimate clubhead speed, ball flight, force, or
+  three-dimensional joint angles.
+- Tracking quality depends on lighting, camera stability, framing, and whether
+  the golfer remains visible throughout the swing.
+
+The responsive mobile review is captured in
+[the mobile interface preview](.impeccable/review/mobile.png).
 
 ## Local development
 
@@ -108,4 +126,4 @@ npm run security:check-client
 
 ## License
 
-No license has been selected yet. All rights are reserved until a license is added.
+Released under the [MIT License](LICENSE).
